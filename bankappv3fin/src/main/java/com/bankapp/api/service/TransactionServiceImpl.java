@@ -3,6 +3,7 @@ package com.bankapp.api.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -106,6 +107,7 @@ public class TransactionServiceImpl implements TransactionService {
     // Transfer
     // =========================
     @Override
+    @PreAuthorize("hasRole('MANAGER') or (hasRole('CLERK') and #req.amount().compareTo(T(java.math.BigDecimal).valueOf(200000)) < 0)")
     public TransactionResponse transfer(TransferRequest req) {
 
         Account from = accountRepo
@@ -152,6 +154,7 @@ public class TransactionServiceImpl implements TransactionService {
     // Approve Pending Txn
     // =========================
     @Override
+    @PreAuthorize("hasRole('MANAGER')")
     public TransactionResponse approve(Long txnId) {
 
         Transaction txn = txnRepo.findById(txnId)
@@ -179,6 +182,7 @@ public class TransactionServiceImpl implements TransactionService {
     // Reject Pending Txn
     // =========================
     @Override
+    @PreAuthorize("hasRole('MANAGER')")
     public TransactionResponse reject(Long txnId) {
 
         Transaction txn = txnRepo.findById(txnId)
